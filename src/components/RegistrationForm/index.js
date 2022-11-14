@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Row, Col, Form, InputGroup } from "react-bootstrap"
+import { Button, Row, Col, Form, InputGroup, Alert } from "react-bootstrap"
 import './index.css'
 
 const RegistrationForm = () => {
@@ -13,17 +13,120 @@ const RegistrationForm = () => {
 		tNCAgreed: false
 	})
 
-	const [userDetailErrors, setUserDetailErrors] = useState([])
+	const [error, setError] = useState({
+		firstName: false,
+		lastName: false,
+		email: false,
+		city: false,
+		state: false,
+		zipCode: false,
+		tNCAgreed: false
+	})
+
+	const [success, setSuccess] = useState(false)
 	
   const handleSubmit = (e) => {
 		e.preventDefault();
 
 		const { firstName, lastName, email, city, state, zipCode, tNCAgreed } = userDetails
+
+		if(firstName.length >= 2) {
+			setError((previousError) => ({
+				...previousError,
+				firstName: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				firstName: true
+			}))
+		}
+	
+		if(lastName.length >= 2) {
+			setError((previousError) => ({
+				...previousError,
+				lastName: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				lastName: true
+			}))
+		}
+	
+		if (
+			email.includes("@") &&
+			email.includes(".") &&
+			email.indexOf("@") != 0 &&
+			email.length - email.lastIndexOf(".") >= 3
+		) {
+			setError((previousError) => ({
+				...previousError,
+				email: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				email: true
+			}))
+		}
+	
+		if(city.length >= 3) {
+			setError((previousError) => ({
+				...previousError,
+				city: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				city: true
+			}))
+		}
+	
+		if(state.length >= 3) {
+			setError((previousError) => ({
+				...previousError,
+				state: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				state: true
+			}))
+		}
+	
+		let zipNumber = parseInt(zipCode)
+		if(zipCode.length === 6 && !isNaN(zipNumber)) {
+			setError((previousError) => ({
+				...previousError,
+				zipCode: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				zipCode: true
+			}))
+		}
+	
+		if(tNCAgreed) {
+			setError((previousError) => ({
+				...previousError,
+				tNCAgreed: false
+			}))
+		} else {
+			setError((previousError) => ({
+				...previousError,
+				tNCAgreed: true
+			}))
+		}
   };
 
   return (
     <>
       <h1 className="display-4">Event Registration Form</h1>
+      {success && (
+        <Alert variant="success">Your details were saved successfully!</Alert>
+      )}
       <Form onSubmit={handleSubmit} className="registration-form">
         <Row className="mb-3">
           <Form.Group as={Col} md="4" controlId="validationCustom01">
@@ -39,10 +142,13 @@ const RegistrationForm = () => {
                 })
               }
             />
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">
-              Please enter a valid first name
-            </Form.Control.Feedback>
+            {error.firstName ? (
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid first name
+              </Form.Control.Feedback>
+            ) : (
+              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            )}
           </Form.Group>
           <Form.Group as={Col} md="4" controlId="validationCustom02">
             <Form.Label>Last name</Form.Label>
@@ -57,10 +163,13 @@ const RegistrationForm = () => {
                 })
               }
             />
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">
-              Please enter a valid last name
-            </Form.Control.Feedback>
+            {error.lastName ? (
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid last name
+              </Form.Control.Feedback>
+            ) : (
+              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            )}
           </Form.Group>
           <Form.Group as={Col} md="4" controlId="validationCustomUsername">
             <Form.Label>Email</Form.Label>
@@ -78,10 +187,13 @@ const RegistrationForm = () => {
                   })
                 }
               />
-              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-              <Form.Control.Feedback type="invalid">
-                Please enter a valid email.
-              </Form.Control.Feedback>
+              {error.email ? (
+                <Form.Control.Feedback type="invalid">
+                  Please enter a valid email.
+                </Form.Control.Feedback>
+              ) : (
+                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+              )}
             </InputGroup>
           </Form.Group>
         </Row>
@@ -99,9 +211,13 @@ const RegistrationForm = () => {
                 })
               }
             />
-            <Form.Control.Feedback type="invalid">
-              Please provide a valid city.
-            </Form.Control.Feedback>
+            {error.city ? (
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid city.
+              </Form.Control.Feedback>
+            ) : (
+              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            )}
           </Form.Group>
           <Form.Group as={Col} md="3" controlId="validationCustom04">
             <Form.Label>State</Form.Label>
@@ -116,10 +232,13 @@ const RegistrationForm = () => {
                 })
               }
             />
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">
-              Please select a valid state.
-            </Form.Control.Feedback>
+            {error.state ? (
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid state.
+              </Form.Control.Feedback>
+            ) : (
+              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            )}
           </Form.Group>
           <Form.Group as={Col} md="3" controlId="validationCustom05">
             <Form.Label>Zip</Form.Label>
@@ -134,25 +253,31 @@ const RegistrationForm = () => {
                 })
               }
             />
-            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            <Form.Control.Feedback type="invalid">
-              Please enter a valid zip.
-            </Form.Control.Feedback>
+            {error.zipCode ? (
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid zip code.
+              </Form.Control.Feedback>
+            ) : (
+              <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            )}
           </Form.Group>
         </Row>
         <Form.Group className="mb-3" style={{ textAlign: "left" }}>
           <Form.Check
             label="Agree to terms and conditions"
-            feedback="You must agree before submitting."
-            feedbackType="invalid"
-						checked={userDetails.tNCAgreed}
-						onChange={() =>
-							setUserDetails({
-								...userDetails,
-								tNCAgreed: !userDetails.tNCAgreed,
-							})
-						}
+            checked={userDetails.tNCAgreed}
+            onChange={() =>
+              setUserDetails({
+                ...userDetails,
+                tNCAgreed: !userDetails.tNCAgreed,
+              })
+            }
           />
+          {error.tNCAgreed && (
+            <Form.Control.Feedback type="invalid">
+              You need to agree to terms and conditions
+            </Form.Control.Feedback>
+          )}
         </Form.Group>
         <Button type="submit">Submit form</Button>
       </Form>
